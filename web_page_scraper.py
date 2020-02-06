@@ -5,8 +5,7 @@ class WebPageScraper:
         self.tags_dict = {}
 
         if not self.validate():
-            print('El HTML es inválido')
-            return {}
+            raise Exception('The provided HTML code is invalid.')
 
         self.body_content = self.get_body_content()
         self.excluded_tags = ['script', 'noscript']
@@ -59,6 +58,12 @@ class WebPageScraper:
         return self.tags_dict
 
     def get_total_nb_of_elements(self):
+        sum = 0
+        for tag in self.tags_dict:
+            sum = sum + self.tags_dict[tag]
+        return sum
+
+    def get_total_nb_of_html_tags(self):
         return len(self.tags_dict)
 
     def get_most_used_tags(self, limit = None):

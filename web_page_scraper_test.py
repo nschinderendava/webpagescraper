@@ -3,13 +3,19 @@ from web_page_scraper import WebPageScraper
 class WebPageScraperTest:
 
     def __init__(self):
+        self.failures = {}
         self.failures_counter = 0
+        self.success_counter = 0
 
     def run(self):
         self.test_scrap()
+        self.test_validator()
+
+        if self.success_counter:
+            print(str(self.success_counter) + ' assertions passed')
 
         if self.failures_counter > 0:
-            print(str(self.failures_counter) + ' tests failed')
+            print(str(self.failures_counter) + ' assertions failed')
         else:
             print('all tests passed')
 
@@ -93,16 +99,76 @@ class WebPageScraperTest:
         ]
 
         for test in tests:
-            htmlContent = test['html']
-            wps = WebPageScraper(htmlContent)
+            wps = WebPageScraper(test['html'])
             output = wps.get_tags()
-            passed = True
             for tag in test['expected']:
-                if tag not in output or (tag in output and output[tag] != test['expected'][tag]):
-                    passed = False
-                    times = output[tag] if tag in output else 0
-                    print(tag + ' was expected to be found exactly ' + str(
-                        test['expected'][tag]) + ' times (was found ' + str(times) + ' times)')
+                self.validate_assertion('test_scrap TEST', test['expected'][tag], output[tag],
+                                        'In ' + test['html'] + ' ' + tag + ' didn\'t appear the expected number of times!!!')
 
-            if passed == False:
-                self.failures_counter += 1
+    def test_validator(self):
+        html1 = """
+                <html>
+                    <head>
+                        <title>Test</title>
+                    </head>
+                    <body attr="attr1"
+                        <div>lalalala</div>
+                        <div attr="lalaatdiv">hello</div>
+                    </body>
+                    <footer>lalala aldjskasd</footer>
+                </html>"""
+        html2 = """
+                <html>
+                    <head>
+                        <title>Test</title>
+                    </head>
+                    <body attr="attr1">
+                        <!-- COMMENT -->
+                        <div>lalalala</div>
+                        <div attr="lalaatdiv">hello</div>
+                    </body>
+                    <footer>lalala aldjskasd</footer>
+                </html>"""
+        html3 = """
+                <html>
+                    <head>
+                        <title>Test</title>
+                    </head>
+                    <body attr="attr1">
+                        <!-- COMMENT
+                        <div>lalalala</div>
+                        <div attr="lalaatdiv">hello</div>
+                    </body>
+                    <footer>lalala aldjskasd</footer>
+                </html>"""
+
+        tests = [
+            {
+                'html': html1,
+                'expected': False
+            },
+            {
+                'html': html2,
+                'expected': True
+            },
+            {
+                'html': html3,
+                'expected': False
+            }
+        ]
+
+        for test in tests:
+            try:
+                wps = WebPageScraper(test['html'])
+            except:
+                continue
+
+            result = wps.validate()
+            self.validate_assertion('test_validator TEST', test['expected'], result, 'Validation of ' + test['html'])
+
+    def validate_assertion(self, test_name, expected, actual_result, error_msg):
+        if expected != actual_result:
+            print(test_name + ' failed - ' + error_msg + ' should be ' + str(expected) + ' - Actual result: ' + str(actual_result))
+            self.failures_counter += 1
+        else:
+            self.success_counter += 1
