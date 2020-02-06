@@ -58,6 +58,9 @@ class WebPageScraper:
     def get_tags(self):
         return self.tags_dict
 
+    def get_total_nb_of_elements(self):
+        return len(self.tags_dict)
+
     def get_most_used_tags(self, limit = None):
         sorted_list = sorted(self.tags_dict.items(), key=lambda x: x[1], reverse=True)
         mosted_used_tags = {}
