@@ -1,20 +1,28 @@
 from web_page_scraper import WebPageScraper
 from web_page_scraper_test import WebPageScraperTest
-import requests
 
-url = 'https://www.pequenitosbabyshop.com.ar/'
-html = requests.get(url).content.decode('utf-8')
+import requests, argparse
 
-wps = WebPageScraper(html)
-output = wps.get_most_used_tags(5)
+parser = argparse.ArgumentParser(description='This is a Web Page Scraper')
+parser.add_argument("--u")
+parser.add_argument("--a")
 
-wpst = WebPageScraperTest()
-wpst.run()
-''' 
-html = '<html><head attr="dlalal"><title>JournalDev HTMLParser</title></head><body attr="lala">' \
-       '<div>lalalala</div><h2>Prueba</h2><h1 attr="prueba" >Python html.parse module</h1><div attr="lalaatdiv">holis</div>' \
-        '<div><div><!-- COMMENT <!-- COMMENT 2 <h2>Lalala</h2>--> --></div></div>' \
-       '</body><footer>lalala aldjskasd</footer></html>'
-'''
+args = parser.parse_args()
 
-print(output)
+url = args.u
+action = args.a
+
+if action == 'test':
+    wpst = WebPageScraperTest()
+    wpst.run()
+elif action == 'all_tags':
+    html = requests.get(url).content.decode('utf-8')
+    wps = WebPageScraper(html)
+    output = wps.get_tags()
+    print(output)
+else:
+    html = requests.get(url).content.decode('utf-8')
+    wps = WebPageScraper(html)
+    output = wps.get_most_used_tags(5)
+    print(output)
+
