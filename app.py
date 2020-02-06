@@ -28,7 +28,7 @@ def main():
             print('The page has ' + str(total_nb_of_elements) + ' elements. ')
             if total_nb_of_elements:
                 nb_of_tags = wps.get_total_nb_of_html_tags()
-                print('Number of HTML tags: ' + str(nb_of_tags))
+                print('It contains ' + str(nb_of_tags) + ' different HTML tags.')
                 print('Most used tags are: ')
                 for tag in most_used_tags:
                     print(' * ' + tag + ' (' + str(most_used_tags[tag]) + ' times)')
